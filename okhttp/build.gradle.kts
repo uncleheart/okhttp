@@ -185,7 +185,7 @@ dependencies {
 }
 
 mavenPublishing {
-  configure(KotlinMultiplatform(javadocJar = JavadocJar.None()))
+  configure(KotlinMultiplatform(javadocJar = JavadocJar.Dokka("dokkaGfm")))
 }
 
 val copyKotlinTemplates = tasks.register<Copy>("copyKotlinTemplates") {
