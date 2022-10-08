@@ -111,6 +111,18 @@ class Http2Connection internal constructor(builder: Builder) : Closeable {
     // set the flow control window to 16MiB.  This avoids thrashing window updates every 64KiB, yet
     // small enough to avoid blowing up the heap.
     if (builder.client) {
+      /**
+       * safari
+      {
+      "frame_type": "SETTINGS",
+      "length": 12,
+      "settings": [
+      "INITIAL_WINDOW_SIZE = 4194304",
+      "MAX_CONCURRENT_STREAMS = 100"
+      ]
+      }
+       */
+      set(Settings.MAX_CONCURRENT_STREAMS, 100)
       set(Settings.INITIAL_WINDOW_SIZE, OKHTTP_CLIENT_WINDOW_SIZE)
     }
   }
@@ -990,7 +1002,7 @@ class Http2Connection internal constructor(builder: Builder) : Closeable {
   }
 
   companion object {
-    const val OKHTTP_CLIENT_WINDOW_SIZE = 16 * 1024 * 1024
+    const val OKHTTP_CLIENT_WINDOW_SIZE = 4 * 1024 * 1024
 
     val DEFAULT_SETTINGS = Settings().apply {
       set(Settings.INITIAL_WINDOW_SIZE, DEFAULT_INITIAL_WINDOW_SIZE)

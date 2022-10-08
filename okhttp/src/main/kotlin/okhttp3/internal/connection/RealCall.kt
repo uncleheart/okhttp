@@ -236,7 +236,7 @@ class RealCall(
     if (newExchangeFinder) {
       this.exchangeFinder = ExchangeFinder(
           connectionPool,
-          createAddress(request.url),
+          createAddress(request),
           this,
           eventListener
       )
@@ -427,7 +427,8 @@ class RealCall(
     interceptorScopedExchange = null
   }
 
-  private fun createAddress(url: HttpUrl): Address {
+  private fun createAddress(request: Request): Address {
+    val url = request.url
     var sslSocketFactory: SSLSocketFactory? = null
     var hostnameVerifier: HostnameVerifier? = null
     var certificatePinner: CertificatePinner? = null
@@ -436,7 +437,7 @@ class RealCall(
       hostnameVerifier = client.hostnameVerifier
       certificatePinner = client.certificatePinner
     }
-
+ ////
     return Address(
         uriHost = url.host,
         uriPort = url.port,
@@ -445,8 +446,8 @@ class RealCall(
         sslSocketFactory = sslSocketFactory,
         hostnameVerifier = hostnameVerifier,
         certificatePinner = certificatePinner,
-        proxyAuthenticator = client.proxyAuthenticator,
-        proxy = client.proxy,
+        proxyAuthenticator = if (request.proxyAuthenticator != null) request.proxyAuthenticator else client.proxyAuthenticator,
+        proxy = if (request.proxy != null) request.proxy else client.proxy,
         protocols = client.protocols,
         connectionSpecs = client.connectionSpecs,
         proxySelector = client.proxySelector

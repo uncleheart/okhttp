@@ -20,6 +20,7 @@ import okhttp3.HttpUrl.Companion.toHttpUrl
 import okhttp3.internal.EMPTY_REQUEST
 import okhttp3.internal.http.HttpMethod
 import okhttp3.internal.toImmutableMap
+import java.net.Proxy
 
 /**
  * An HTTP request. Instances of this class are immutable if their [body] is null or itself
@@ -30,6 +31,8 @@ class Request internal constructor(
   @get:JvmName("method") val method: String,
   @get:JvmName("headers") val headers: Headers,
   @get:JvmName("body") val body: RequestBody?,
+  @get:JvmName("proxy") val proxy: Proxy?,
+  @get:JvmName("proxyAuthenticator") val proxyAuthenticator: Authenticator?,
   internal val tags: Map<Class<*>, Any>
 ) {
 
@@ -138,6 +141,8 @@ class Request internal constructor(
     internal var method: String
     internal var headers: Headers.Builder
     internal var body: RequestBody? = null
+    internal var proxy: Proxy? = null
+    internal var proxyAuthenticator: Authenticator? = null
 
     /** A mutable map of tags, or an immutable empty map if we don't have any. */
     internal var tags: MutableMap<Class<*>, Any> = mutableMapOf()
@@ -157,6 +162,8 @@ class Request internal constructor(
         request.tags.toMutableMap()
       }
       this.headers = request.headers.newBuilder()
+      this.proxy = request.proxy;
+      this.proxyAuthenticator = request.proxyAuthenticator;
     }
 
     open fun url(url: HttpUrl): Builder = apply {
@@ -246,6 +253,14 @@ class Request internal constructor(
 
     open fun patch(body: RequestBody) = method("PATCH", body)
 
+    open fun proxy(proxy: Proxy): Builder = apply {
+        this.proxy = proxy;
+    }
+
+    open fun proxyAuthenticator(proxyAuthenticator: Authenticator): Builder = apply {
+        this.proxyAuthenticator = proxyAuthenticator;
+    }
+
     open fun method(method: String, body: RequestBody?): Builder = apply {
       require(method.isNotEmpty()) {
         "method.isEmpty() == true"
@@ -290,6 +305,8 @@ class Request internal constructor(
           method,
           headers.build(),
           body,
+          proxy,
+          proxyAuthenticator,
           tags.toImmutableMap()
       )
     }
